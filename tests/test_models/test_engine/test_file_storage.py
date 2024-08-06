@@ -26,9 +26,31 @@ classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
 class TestFileStorageDocs(unittest.TestCase):
     """Tests to check the documentation and style of FileStorage class"""
     @classmethod
-    def setUpClass(cls):
+    """def setUpClass(cls):
         """Set up for the doc tests"""
-        cls.fs_f = inspect.getmembers(FileStorage, inspect.isfunction)
+        cls.fs_f = inspect.getmembers(FileStorage, inspect.isfunction)"""
+
+    def setUpClass(cls):
+        """Set up for the doc tests."""
+        cls.storage = FileStorage()
+        cls.storage.reload()  # Load existing data
+        cls.model = BaseModel()
+        cls.model.save()
+        cls.storage.new(cls.model)
+        cls.storage.save()
+
+    def test_get(self):
+        """Test the get method."""
+        retrieved = self.storage.get(BaseModel, self.model.id)
+        self.assertEqual(retrieved, self.model)
+        self.assertIsNone(self.storage.get(BaseModel, "nonexistent_id"))
+
+    def test_count(self):
+        """Test the count method."""
+        count_all = self.storage.count()
+        count_model = self.storage.count(BaseModel)
+        self.assertEqual(count_all, 1)
+        self.assertEqual(count_model, 1)
 
     def test_pep8_conformance_file_storage(self):
         """Test that models/engine/file_storage.py conforms to PEP8."""
